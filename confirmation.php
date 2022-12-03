@@ -17,7 +17,7 @@
         $birthdate = $_REQUEST['birthdate'];
         $password = $_REQUEST['password'];
 
-        insertAccount($profile, $email, $firstname, $lastname, $gender, $birthdate, md5($password));
+        insertAccount($profile, $email, $firstname, $lastname, $gender, $birthdate, $password);
         $result = $_SESSION['result'];
 
         if($profile != '')

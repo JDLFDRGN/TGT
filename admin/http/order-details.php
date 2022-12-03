@@ -11,6 +11,7 @@
        $couponID = isset($json->couponID) ? $json->couponID : 0;
        $coupon = $json->coupon;
        $total = $json->total;
+       $shipping = $json->shipping;
      }
    
      if(isset($_POST['submit'])){

@@ -45,7 +45,7 @@
                           </div>
                           <div
                               class="flex items-center w-full py-4 text-sm font-semibold border-b border-gray-300 lg:py-5 lg:px-3 text-heading last:border-b-0 last:text-base last:pb-0">
-                              Shipping<span class="ml-2">-₱<span class="shipping"><?php echo $results['payment'] == 'cop' ? '0.00' : '50.00';?></span></span>
+                              Shipping<span class="ml-2">₱<span class="shipping"><?php echo $results['payment'] == 'cop' ? '0.00' : $shipping;?></span></span>
                           </div>
                           <div
                               class="flex items-center w-full py-4 text-sm font-semibold border-b border-gray-300 lg:py-5 lg:px-3 text-heading last:border-b-0 last:text-base last:pb-0">
@@ -149,10 +149,8 @@
 
                               <div class="mt-4">
                                   <div class="w-full">
-                                      <label for="number"
-                                          class="block mb-3 text-sm font-semibold text-gray-500">Payment Method</label>
-                                      <input required readonly value="<?php echo $results['payment']?>" name="payment" type="text" placeholder="Payment"
-                                          class="w-full px-4 py-3 text-sm border border-gray-300 rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600">
+                                      <label for="number" class="block mb-3 text-sm font-semibold text-gray-500">Payment Method</label>
+                                      <input required readonly value="<?php echo $results['payment']?>" name="payment" type="text" placeholder="Payment" class="payment w-full px-4 py-3 text-sm border border-gray-300 rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600">
                                   </div>
                               </div>
                               <!-- Gcash -->
@@ -197,25 +195,29 @@
                     <input type="hidden" class="net" name="net">    
                     <div class="flex flex-wrap w-full justify-evenly mt-8">
                         <div>
-                            <input type="radio" id="new" name="status" value="New" <?php echo $results['status'] == 'New' ? 'checked' : '';?>>
+                            <input type="radio" class="status" id="new" name="status" value="New" <?php echo $results['status'] == 'New' ? 'checked' : '';?>>
                             <label for="new" class="capitalize">new</label>
                         </div>    
-                        <div>
-                            <input type="radio" id="new" name="status" value="Processing" <?php echo $results['status'] == 'Processing' ? 'checked' : '';?>>
+                        <div class="<?php echo $results['payment'] == 'cop' ? 'hidden' : '';?>">
+                            <input type="radio" class="status" id="processing" name="status" value="Processing" <?php echo $results['status'] == 'Processing' ? 'checked' : '';?>>
                             <label for="new" class="capitalize">processing</label>
                         </div>    
-                        <div>
-                            <input type="radio" id="new" name="status" value="In Transit" <?php echo $results['status'] == 'In Transit' ? 'checked' : '';?>>
+                        <div class="<?php echo $results['payment'] == 'cop' ? 'hidden' : '';?>">
+                            <input type="radio" class="status" id="in-transit" name="status" value="In Transit" <?php echo $results['status'] == 'In Transit' ? 'checked' : '';?>>
                             <label for="new" class="capitalize">in transit</label>
                         </div>    
-                        <div>
-                            <input type="radio" id="new" name="status" value="Out For Delivery" <?php echo $results['status'] == 'Out For Delivery' ? 'checked' : '';?>>
+                        <div class="<?php echo $results['payment'] == 'cop' ? 'hidden' : '';?>">
+                            <input type="radio" class="status" id="out-for-delivery" name="status" value="Out For Delivery" <?php echo $results['status'] == 'Out For Delivery' ? 'checked' : '';?>>
                             <label for="new" class="capitalize">out for delivery</label>
-                        </div>    
+                        </div>
                         <div>
-                            <input type="radio" id="new" name="status" value="Received" <?php echo $results['status'] == 'Received' ? 'checked' : '';?>>
-                            <label for="new" class="capitalize">Received</label>
-                        </div>    
+                            <input type="radio" class="status" id="received" name="status" value="Received" <?php echo $results['status'] == 'Received' ? 'checked' : '';?>>
+                            <label for="new" class="capitalize">received</label>
+                        </div>  
+                        <div>
+                            <input type="radio" class="status" id="cancelled" name="status" value="Cancelled" <?php echo $results['status'] == 'Cancelled' ? 'checked' : '';?>>
+                            <label for="new" class="capitalize">cancelled</label>
+                        </div>  
                     </div>
 
                     <div class="mt-4">

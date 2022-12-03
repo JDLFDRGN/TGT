@@ -35,7 +35,7 @@
             $results = myOrder($_SESSION['result']['ID']);
             foreach($results as $result){
                 
-                if($result['status'] == 'New')
+                if($result['status'] == 'New' || $result['status'] == 'Cancelled')
                     $percentage = '0';
                 else if($result['status'] == 'Processing')
                     $percentage = '25';
@@ -59,6 +59,10 @@
                         $subtotal = $json->subtotal;
                         $coupon = $json->coupon;
                         $total = $json->total;
+                        $shipping = $json->shipping;
+
+                        $cancelled = $result['status'] == 'New' || $result['status'] == 'Processing' ? '' : 'hidden';
+                        $received = $result['status'] == 'Out For Delivery' ? '' : 'hidden';
 
                         foreach($datas as $data){
                             $row = (array)$data;
@@ -92,11 +96,11 @@
                     echo "<div class='p-2 mt-14 w-full md:w-1/2 xl:w-1/5 flex xl:justify-center'>";
                         echo "<div class='w-fit computation'>";
                             echo "<h1 class='capitalize font-bold text-xl'>computation</h1>";
-                            echo "<div class='flex justify-between capitalize mt-1 text-sm text-slate-700'>pay via: <span>$result[payment]</span></div>";
+                            echo "<div class='flex justify-between capitalize mt-1 text-sm text-slate-700'>pay via: <span class='payment'>$result[payment]</span></div>";
                             echo "<div class='flex justify-between capitalize mt-1 text-sm text-slate-700'>subtotal: <span>₱<span class='subtotal'>$subtotal</span></span></div>";
                             echo "<div class='flex justify-between capitalize mt-1 text-sm text-slate-700'>coupon: <span>₱<span class='coupon'>$coupon</span></span></div>";
                             echo "<div class='flex justify-between capitalize mt-1 text-sm text-slate-700'>total: <span>₱<span class='total'>$total</span></span></div>";
-                            echo "<div class='flex justify-between capitalize mt-1 text-sm text-slate-700'>shipping: <span>₱<span class='shipping'>50.00</span></span></div>";
+                            echo "<div class='flex justify-between capitalize mt-1 text-sm text-slate-700'>shipping: <span>₱<span class='shipping'>$shipping</span></span></div>";
                             echo "<div class='flex justify-between capitalize mt-1 text-base text-slate-800'>overall: <span>₱<span class='overall'>0.00</span></span></div>";
                         echo "</div>";
                     echo "</div>";
@@ -105,6 +109,8 @@
                         echo "<div class='grid place-items-center h-full xl:h-1/2'>";
                             include "./progress.php";
                         echo "</div>";
+                        echo "<div class='$received received-order text-center mt-8 hover:cursor-pointer capitalize font-semibold text-green-500' onclick='receivedOrder($result[ID]);'>received order</div>";
+                        echo "<div class='$cancelled cancel-order text-center mt-8 hover:cursor-pointer capitalize font-semibold text-red-600' onclick='cancelOrder($result[ID]);'>cancel order</div>";
                     echo "</div>";
                 echo "</div>";
             }    
@@ -125,7 +131,6 @@
                 </form>
             </div>
         </div>
-        
     </section>
     <?php include "partials/footer.php";?>
 </body>
@@ -144,7 +149,7 @@
             if(payment.innerHTML == 'cop')
                 shipping.innerHTML = '0.00';
 
-            overall.innerHTML = parseFloat(total.innerHTML) - parseFloat(shipping.innerHTML);
+            overall.innerHTML = parseFloat(total.innerHTML) + parseFloat(shipping.innerHTML);
         });
     });
     $('.hover').ready(()=>{
@@ -210,4 +215,23 @@
         $('.review-modal').hide();
         $('html').removeClass('overflow-hidden');
     });
+
+    function cancelOrder(id){
+        let form = new FormData();
+        form.append('ID', id);
+        
+        fetch('./cancel-order.php', {method: 'post', body: form}).then(res=>res.text()).then(data=>{
+            location.reload();
+        })
+    }
+    
+    function receivedOrder(id){
+        let form = new FormData();
+        form.append('ID', id);
+        
+        fetch('./received-order.php', {method: 'post', body: form}).then(res=>res.text()).then(data=>{
+            location.reload();
+        })
+    }
+
 </script>

@@ -18,6 +18,7 @@
         $lastname = $_POST['lastname'];
         $email = $_POST['email'];
         $number = $_POST['number'];
+        $package = $_POST['package'];
         $address = $_POST['address'] != '' ? $_POST['address'] : 'NA';
         $gcash = $_POST['gcash'] != '' ? md5($_POST['gcash']) : 'NA';
         $mpin = $_POST['mpin'] != '' ? md5($_POST['mpin']) : 'NA';
@@ -59,7 +60,7 @@
 
             echo $payment;
 
-                insertOrder($_SESSION['result']['ID'], $payment, $_REQUEST['package'], $firstname, $lastname, $email, $number, $city, $zipcode, $hnos, $barangay, $address, $gcash, $mpin, $appointment);
+                insertOrder($_SESSION['result']['ID'], $payment, $package, $firstname, $lastname, $email, $number, $city, $zipcode, $hnos, $barangay, $address, $gcash, $mpin, $appointment);
             
             if($coupon != 0)
                 couponDeduct($_SESSION['result']['ID'], $couponID, couponQuantity($couponID) - 1);
@@ -87,6 +88,9 @@
                         <div><?php include "./partials/payment.php";?></div>
                     </div>
                     <form class="justify-center w-full mx-auto" method="post" action>
+                        <textarea class="hidden package" name="package">
+                            <?php echo $_REQUEST['package'];?>
+                        </textarea> 
                         <div class="">
                             <div class="space-x-0 lg:flex lg:space-x-4">
                                 <div class="w-full lg:w-1/2">
@@ -119,25 +123,19 @@
                                 </div>
                             </div>
                             <div class="mt-4 address-container">
+                                <div class="flex items-center justify-between mt-8">
+                                    <h2 class="font-bold md:text-xl text-heading ">Address Information</h2>
+                                    <div class="flex items-center">
+                                        <input type="checkbox">
+                                        <label class="capitalize text-sm ml-2 font-semibold text-gray-500">use default address</label>
+                                    </div>
+                                </div>
                                 <div class="space-x-0 lg:flex lg:space-x-4 mt-4">
                                     <div class="w-full lg:w-1/2">
                                         <label for="firstname" class="block mb-3 text-sm font-semibold text-gray-500">City</label>
                                         <select name="city" class="city w-full px-4 py-3 text-sm border border-gray-300 rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600">                    
                                             <option value="" class="city-select">--Cities--</option>
-                                            <?php
-                                                $cities = json_decode(file_get_contents("./cities.json"));
-                                                $array = [];
-                                                foreach($cities as $city){
-                                                    $city = (array)$city;
-                                                    array_push($array, $city['city']);
-                                                }
-                                                sort($array);
-
-                                                foreach($array as $city)
-                                                    echo "<option value='$city'>$city</option>";
-                                                
-                                            ?>
-                                        </select>
+                                         </select>
                                     </div>
                                     <div class="w-full lg:w-1/2 ">
                                         <label for="lastname" class="block mb-3 text-sm font-semibold text-gray-500">Zip Code</label>
@@ -145,26 +143,26 @@
                                             class="w-full zipcode px-4 py-3 text-sm border border-gray-300 rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600">
                                     </div>
                                 </div>
-                                <div class="w-full mt-4">
+                                <!-- <div class="w-full mt-4">
                                     <label for="number"
                                         class="block mb-3 text-sm font-semibold text-gray-500">House Number or Street</label>
                                     <input required name="hnos" type="text" placeholder="House Number or Street"
                                         class="w-full px-4 py-3 hnos text-sm border border-gray-300 rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600">
+                                </div> -->
+                                <div class="w-full mt-4">
+                                    <label for="number" class="block mb-3 text-sm font-semibold text-gray-500">Barangay</label>
+                                    <select name="barangay" disabled class="barangay w-full px-4 py-3 text-sm border border-gray-300 rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600">                    
+                                        <option value="" class="barangay-select">--Barangay--</option>
+                                    </select>
                                 </div>
                                 <div class="w-full mt-4">
-                                    <label for="number"
-                                        class="block mb-3 text-sm font-semibold text-gray-500">Barangay</label>
-                                    <input required name="barangay" type="text" placeholder="Barangay"
-                                        class="w-full px-4 py-3 hnos text-sm border border-gray-300 rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600">
+                                    <label for="address" class="block mb-3 text-sm font-semibold text-gray-500">Address</label>
+                                    <textarea required class="w-full address px-4 py-3 text-xs border border-gray-300 resize-none rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600" name="address" cols="20" rows="4" placeholder="Address"></textarea>
                                 </div>
-                                <div class="w-full mt-4">
-                                    <label for="address"
-                                        class="block mb-3 text-sm font-semibold text-gray-500">Address</label>
-                                    <textarea required
-                                        class="w-full address px-4 py-3 text-xs border border-gray-300 rounded lg:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600"
-                                        name="address" cols="20" rows="4" placeholder="Address"></textarea>
+                                <div class="flex items-center mt-2">
+                                    <input type="checkbox">
+                                    <label class="capitalize text-sm ml-2 font-semibold text-gray-500">set as default</label>
                                 </div>
-                               
                             </div>
                             <!-- Gcash -->
                             <div class="gcash-container hidden">
@@ -251,7 +249,7 @@
                         </div>
                         <div class="flex items-center justify-between w-full py-4 text-sm font-semibold border-b border-gray-300 lg:py-5 lg:px-3 text-heading last:border-b-0 last:text-base last:pb-0">
                             <span class="text-slate-500">Shipping</span>   
-                            <span class="ml-2 text-slate-500">-₱<span class="shipping text-slate-500">50.00</span></span>
+                            <span class="ml-2 text-slate-500">₱<span class="shipping text-slate-500">200.00</span></span>
                         </div>
                         <div class="flex items-center justify-between w-full py-4 text-sm font-semibold border-b border-gray-300 lg:py-5 lg:px-3 text-heading last:border-b-0 last:text-base last:pb-0">
                             <span class=" text-slate-700">Overall</span>   
@@ -286,6 +284,7 @@
 
         if(paymentID == 1){
             $('.address-container').removeClass('hidden');
+            $('.shipping').html('200.00');
             $('.address').attr('required', '1');
             $('.hnos').attr('required', '1');
             $('.city').attr('required', '1');
@@ -313,11 +312,66 @@
     });
 
     $(document).ready(()=>{
+        var city = '';
+        var shippingFee = 200;
+
         $('.overall').text(computeOverall());
+        storePackage();
+
+        $.getJSON('./location.json', (data)=>{
+            $.each(data.province_list, (key, value)=>{
+                $.each(value.municipality_list, (key2, value2)=>{
+                    city += `<option value="${key2}" data-shipping-fee="${shippingFee.toFixed(2)}">${key2}</option>`;
+                    shippingFee += 5;
+                })
+            })
+            $('.city').html($('.city').html() + city);
+        })
+
+        $('.city').change(()=>{
+            let barangay = '';
+            let shippingValue = $('.city>option:selected').attr('data-shipping-fee');
+
+            $('.barangay').html("<option value=''>--Barangay--</option>");
+            $('.shipping').html(shippingValue);
+            $('.overall').text(computeOverall());
+            storePackage();
+            
+            if($('.city').val() == ''){
+                $('.barangay').attr('disabled', true);
+                $('.barangay').val('');
+            }else{
+                $('.barangay').attr('disabled', false);
+
+                $.getJSON('./location.json', (data)=>{
+                    $.each(data.province_list, (key, value)=>{
+                        $.each(value.municipality_list, (key2, value2)=>{
+                            $.each(value2.barangay_list, (key3, value3)=>{
+                                if($('.city').val() == key2){
+                                    barangay += `<option value="${value3}">${value3}</option>`;
+                                }
+                            })
+                        })
+                    })
+                    $('.barangay').html($('.barangay').html() + barangay);
+                })
+            }
+        })
     });
 
     function computeOverall(){
-        let overall = parseFloat($('.total').text()) - parseFloat($('.shipping').text());
+        let overall = parseFloat($('.total').text()) + parseFloat($('.shipping').text());
         return overall.toFixed(2);
+    }
+
+    function storePackage(){
+        var package = JSON.parse($('.package').val());
+        
+        package.overall = $('.overall').html();
+        package.shipping = $('.shipping').html();
+
+        $('.package').val(JSON.stringify(package));
+
+        console.log(package);
     }
 </script>

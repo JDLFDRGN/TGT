@@ -32,4 +32,16 @@
         $query = "DELETE FROM tbl_order WHERE ID = '$id';";
         $connect->query($query);
     }
+    function cancelOrder($id){
+        global $connect;
+
+        $query = "UPDATE tbl_order SET status = 'Cancelled' WHERE ID = '$id';";
+        $connect->query($query);
+    }
+    function receivedOrder($id){
+        global $connect;
+
+        $query = "UPDATE tbl_order SET status = 'Received' WHERE ID = '$id';";
+        $connect->query($query);
+    }
 ?>
